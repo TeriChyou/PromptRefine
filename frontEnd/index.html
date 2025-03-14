@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Explanation Evaluator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 10px;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+        }
+        #question {
+            height: 100px;
+        }
+        #answer {
+            height: 200px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #evaluation {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>AI Explanation Evaluator</h1>
+    <form id="evaluationForm">
+        <label for="question">問題:</label>
+        <textarea id="question" name="question" placeholder="請輸入問題" required></textarea>
+        
+        <label for="answer">回答:</label>
+        <textarea id="answer" name="answer" placeholder="請輸入答案" required></textarea>
+        
+        <br>
+        <button type="submit">AI評分</button>
+    </form>
+    <h2>AI評分結果:</h2>
+    <div id="evaluation"></div>
+    
+    <!-- Include marked.js -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <script>
+        document.getElementById('evaluationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const question = document.getElementById('question').value;
+            const answer = document.getElementById('answer').value;
+
+            fetch('http://127.0.0.1:5000/python-api/gpt-generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ question: question, answer: answer })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data) {
+                    // Convert Markdown to HTML using marked and insert into the div
+                    document.getElementById('evaluation').innerHTML = JSON.stringify(data);
+                } else {
+                    document.getElementById('evaluation').innerText = 'Error: ' + data.error;
+                }
+            })
+            .catch(error => {
+                document.getElementById('evaluation').innerText = 'Error: ' + error;
+            });
+        });
+    </script>
+</body>
+</html>
