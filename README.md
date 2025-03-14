@@ -23,3 +23,5 @@ This is an feedback and scoring system using AI models, based on Double Prompt c
   - When changing the contents and the parameters in app.py, rememeber to add the same parameters in index.html.
 - If wanna test out, please run app.py at first, then run index.html. (Both are local host, if wanna host with fixed IP need other stuffs.)
   - app.py's Environment API key requires openAI's API key to be set in the Environment. Thus, can not just execute then run.
+  - Try run `$env:OPENAI_API_KEY = "your API key"` in your powershell, and you can use `echo $env:OPENAI_API_KEY` to check if the key is set.
+`
