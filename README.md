@@ -5,6 +5,7 @@
 ### Abstract
 
 This is an feedback and scoring system using AI models, based on Double Prompt concept.
+![image](https://github.com/user-attachments/assets/1567b6bc-12c0-4c19-bfaa-8c32033bf112)
 
 ## Developing history
 
