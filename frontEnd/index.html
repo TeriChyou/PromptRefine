@@ -3,102 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Explanation Evaluator</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        h1 {
-            color: #333;
-        }
-        label {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 10px;
-        }
-        textarea {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
-        }
-        #question {
-            height: 100px;
-        }
-        #answer {
-            height: 200px;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 5px;
-            border: none;
-            background-color: #007BFF;
-            color: white;
-            cursor: pointer;
-            box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        #evaluation {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-        }
-    </style>
+    <title>磨課師學習獎勵措施 審核平台 ver:0.0.1</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>AI Explanation Evaluator</h1>
-    <form id="evaluationForm">
-        <label for="question">問題:</label>
-        <textarea id="question" name="question" placeholder="請輸入問題" required></textarea>
-        
-        <label for="answer">回答:</label>
-        <textarea id="answer" name="answer" placeholder="請輸入答案" required></textarea>
-        
-        <br>
-        <button type="submit">AI評分</button>
-    </form>
-    <h2>AI評分結果:</h2>
-    <div id="evaluation"></div>
-    
-    <!-- Include marked.js -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Header -->
+    <header>
+        <h1>資料提交審核</h1>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <div class="row">
+                <input type="file" id="pdfFile" accept="application/pdf">
+                <button type="button" onclick="submitPDF()">Submit</button>
+            </div>
+            <div id="feedbackWindow" class="feedback-window">
+                <!-- Feedback will be inserted here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <h3></h3>
+    </footer>
 
     <script>
-        document.getElementById('evaluationForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        function submitPDF() {
+            const fileInput = document.getElementById('pdfFile');
+            const file = fileInput.files[0];
 
-            const question = document.getElementById('question').value;
-            const answer = document.getElementById('answer').value;
+            if (!file) {
+                alert('Please select a PDF file.');
+                return;
+            }
 
-            fetch('http://127.0.0.1:5000/python-api/gpt-generate', {
+            const formData = new FormData();
+            formData.append('pdf', file);
+            formData.append('instruction', 'Please analyze this application form.');
+
+            fetch('http://127.0.0.1:5000/python-api/analyzeApplication', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ question: question, answer: answer })
+                body: formData
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data) {
-                    // Convert Markdown to HTML using marked and insert into the div
-                    document.getElementById('evaluation').innerHTML = JSON.stringify(data);
-                } else {
-                    document.getElementById('evaluation').innerText = 'Error: ' + data.error;
+            .then(async res => {
+                const data = await res.json();
+                if (!res.ok) {
+                    throw new Error(data.error || 'Unknown error occurred');
                 }
+                const feedbackDiv = document.getElementById('feedbackWindow');
+                feedbackDiv.innerHTML = `
+                    <ul>
+                        <li><strong>學號 ID:</strong> ${data.applicantStdn || 'N/A'}</li>
+                        <li><strong>申請編號 No:</strong> ${data.applicantNo || 'N/A'}</li>
+                        <li><strong>姓名:</strong> ${data.applicantName || 'N/A'}</li>
+                        <li><strong>初步審核是否通過:</strong> ${data.isPassed === false ? '否' : data.isPassed === true ? '是' : 'N/A'}</li>
+                        <li><strong>審核結果理由:</strong> ${data.aiFeedback || 'N/A'}</li>
+                        <li><strong>申請日:</strong> ${data.applyDate || 'N/A'}</li>
+                        <li><strong>申請時:</strong> ${data.applyTime || 'N/A'}</li>
+                    </ul>
+                `;
             })
-            .catch(error => {
-                document.getElementById('evaluation').innerText = 'Error: ' + error;
+            .catch(err => {
+                const feedbackDiv = document.getElementById('feedbackWindow');
+                feedbackDiv.innerHTML = `<div class="error">❌ ${err.message}</div>`;
             });
-        });
+        }
     </script>
 </body>
 </html>

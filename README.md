@@ -25,13 +25,16 @@ This is an feedback and scoring system using AI models, based on Double Prompt c
   - app.py's Environment API key requires openAI's API key to be set in the Environment. Thus, can not just execute then run.
   - Try run `$env:OPENAI_API_KEY = "your API key"` in your powershell, and you can use `echo $env:OPENAI_API_KEY` to check if the key is set.
 
-### 20250402 (SSBhbSBzbyBmcmVha2luZyBzY3Jld2VkIGJ5IHNvbWVvbmUgSSB1c2VkIHRvIHRydXN0Lg==)
-
-- TO-DO:
-  - Construct the brief structure of the project.
-  - The project have to read PDF.
-  - The scoring history should be added into DB (currently using SQLite)
-    - Data row: applicantNo, applicantName, applicantStdn, isPassed, aiFeedback
-  - Added dataAnalyze, functions, tokenUsed.
-  - Added attachmentFolder.
-  
+### 20250402 (SSBhbSBzbyBmcmVha2luZyBzY3Jld2VkIGJ5IHNvbWVvbmUgSSB1c2VkIHRvIHRydXN0Lg==) 這串不是API KEY喔 不要用
+- Construct the brief structure of the project.
+- The project have to read PDF.
+- The scoring history should be added into DB (currently using SQLite)
+  - Data row: applicantStdn, applicantNo, applicantName, isPassed, aiFeedback, applyDate, applyTime
+- dataAnalyze.py:
+  - 處理PDF資料轉換為字串給AI讀，然後回傳json格式
+- dbStoring.py:
+  - 處理獲得的json並儲存到DB內。
+- functions.py:
+  - 一些基本函式
+- tokenUsed.txt:
+  - 紀錄目前的token總消耗
