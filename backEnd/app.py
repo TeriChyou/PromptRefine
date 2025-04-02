@@ -4,6 +4,9 @@ import os
 import json
 import openai
 
+# Import custom modules
+import dataAnalyze
+
 # Initialize the Flask app
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -30,6 +33,7 @@ conversation_history = []
 file_path = os.path.abspath(r'backEnd/promptList/prompt.txt')
 system_instruction = read_file_to_string(file_path)
 
+# Basic GPT generate function
 @app.route('/python-api/gpt-generate', methods=['POST'])
 def generate_gpt_response():
     data = request.json
@@ -89,6 +93,61 @@ def generate_gpt_response():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
+
+# Analyze application PDF with GPT
+@app.route('/python-api/analyzeApplication', methods=['POST'])
+def generate_application_feedback():
+    data = request.json
+    file_path = data.get('file_path', 'No file path provided.')
+    question = data.get('question', 'No question provided.')
+    answer = data.get('answer', 'No answer provided.')
+
+    try:
+        # Read the PDF file and extract text (assuming the function is defined elsewhere)
+        text = dataAnalyze.extract_file_content(file_path)
+
+        # Call OpenAI's GPT-4o API with the extracted text and question
+        response = openai.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {
+                    "role": "system",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": system_instruction + f"Question: {question}\nAnswer: {answer}\n\n{file_path}"
+                        }
+                    ]
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": text
+                        }
+                    ]
+                }
+            ],
+            temperature=1,
+            max_tokens=16384,
+            top_p=0.95,
+            frequency_penalty=0,
+            presence_penalty=0
+        )
+
+        # Extract the response text from GPT-4
+        gpt_response_text = response.choices[0].message.content.strip()
+
+        # Parse the response text as JSON
+        gpt_response_json = json.loads(gpt_response_text)
+
+        return jsonify(gpt_response_json)
+    except json.JSONDecodeError:
+        return jsonify({"error": "Invalid JSON response from GPT"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 # Run the app on localhost
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
