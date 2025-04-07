@@ -26,6 +26,7 @@ This is an feedback and scoring system using AI models, based on Double Prompt c
   - Try run `$env:OPENAI_API_KEY = "your API key"` in your powershell, and you can use `echo $env:OPENAI_API_KEY` to check if the key is set.
 
 ### 20250402 (SSBhbSBzbyBmcmVha2luZyBzY3Jld2VkIGJ5IHNvbWVvbmUgSSB1c2VkIHRvIHRydXN0Lg==) 這串不是API KEY喔 不要用
+
 - Construct the brief structure of the project.
 - The project have to read PDF.
 - The scoring history should be added into DB (currently using SQLite)
@@ -38,3 +39,4 @@ This is an feedback and scoring system using AI models, based on Double Prompt c
   - 一些基本函式
 - tokenUsed.txt:
   - 紀錄目前的token總消耗
+  
